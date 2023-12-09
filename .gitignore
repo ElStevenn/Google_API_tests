@@ -1,2 +1,10 @@
+# Ignore specific files in CRUD directory
 CRUD/credentials.json
 CRUD/token.json
+
+# Ignore venv
+/venv/
+
+# Ignore other credentials and token
+API_integration/services/credentials.json
+API_integration/services/token.json
