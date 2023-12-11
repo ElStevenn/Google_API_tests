@@ -30,7 +30,7 @@ def append():
         valueInputOption = "USER_ENTERED"
         range_name = "C8:G8"
         # values = [[str(data[dat]) for dat in data]]
-        values = [[data[dat] for dat in data]]
+        values = [[data[dat] if not dat == "phone" else str(f"\"{data['phone']}\"") for dat in data]]
 
         # Call append method
         append_result = doc_crus.append(range_name, valueInputOption, values)

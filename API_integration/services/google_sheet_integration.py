@@ -108,14 +108,19 @@ class Document_CRUD():
             # Assuming you have a valid method to get the sheet ID
             sheet_id = self.get_sheet_id("Your Sheet Name")  # Replace "Your Sheet Name" with the actual sheet name
 
-            # Define border styles
-            border_style = {
-                "style": "SOLID",
-                "width": 1,
-                "color": {"red": 0, "green": 0, "blue": 0, "alpha": 1}
-            }
+            # Call function to print the borders
+            self.update_border_request(sheet_id, start_row_index, end_row_index, 2, 7)
 
-            # Border request
+
+        except HttpError as error:
+            print(f"An error occurred: {error}")
+            return error
+    
+
+    def update_border_request(self, sheet_id, start_row_index, end_row_index, startColumnIndex, endColumnIndex, border_style = { "style": "SOLID", "width": 1, "color": {"red": 0, "green": 0, "blue": 0, "alpha": 1} }):
+        service = self.auth()
+        # Border request
+        try:
             border_requests = {
                 "requests": [{
                     "updateBorders": {
@@ -123,8 +128,8 @@ class Document_CRUD():
                             "sheetId": sheet_id,
                             "startRowIndex": start_row_index,
                             "endRowIndex": end_row_index,
-                            "startColumnIndex": 2,  # Adjust if needed
-                            "endColumnIndex": 7     # Adjust if needed
+                            "startColumnIndex": startColumnIndex,  # Adjust if needed
+                            "endColumnIndex": endColumnIndex     # Adjust if needed
                         },
                         "top": border_style,
                         "bottom": border_style,
@@ -137,17 +142,16 @@ class Document_CRUD():
             }
 
             # Update borders
-            service.spreadsheets().batchUpdate(
-                spreadsheetId=self.Spreadsheet_ID, 
-                body=border_requests
-            ).execute()
-
-            return append_result
-
+            border_result = service.spreadsheets().batchUpdate(
+                    spreadsheetId=self.Spreadsheet_ID, 
+                    body=border_requests
+                ).execute()
+       
+            return border_result
         except HttpError as error:
             print(f"An error occurred: {error}")
             return error
-    
+
     def extract_row_index(self, range_string):
         # Pattern to match the row number in the range string (e.g., '5' in 'Sheet1!A5:Z5')
         match = re.search(r'(\d+)', range_string.split('!')[1])
