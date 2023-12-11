@@ -102,16 +102,93 @@ def batch_get_values(spreadsheet_id, _range_names):
     return error
 
 
+def update_values(spreadsheet_id, range_name, value_input_option, _values):
+  creds = Credentials.from_authorized_user_file("token.json", SCOPES)
+  """
+  vasically,update a value by its cell cordinates
+  """
+  try:
+    service = build("sheets", "v4", credentials=creds)
+
+    body = {"values":_values}
+    result = (
+      service.spreadsheets()
+      .values()
+      .update(
+        spreadsheetId=spreadsheet_id,
+        range=range_name,
+        valueInputOption=value_input_option,
+        body=body,
+      )
+      .execute()
+    )
+
+    print(f"{result.get('updatedCells')} cells updated.")
+    return result
+
+  except HttpError as error:
+    print(f"An error ocurred: {error}")
+    return error
+
+def batch_update_values(
+    spreadsheet_id, range_name, value_input_option, _values
+):
+  """*add description here*"""
+  creds = Credentials.from_authorized_user_file("token.json", SCOPES)
+  try:
+    service = build("sheets", "v4", credentials=creds)
+    data = [
+        {"range": range_name, "values": _values},
+        # Additional ranges to update ...
+    ]
+    body = {"valueInputOption": value_input_option, "data": data}
+    result = (
+        service.spreadsheets()
+        .values()
+        .batchUpdate(spreadsheetId=spreadsheet_id, body=body)
+        .execute()
+    )
+    print(f"{(result.get('totalUpdatedCells'))} cells updated.")
+    return result
+  except HttpError as error:
+    print(f"An error ocurred: {error}")
+    return error
+
+def append_values(spreadsheet_id, range_name, value_input_option, _values):
+  """
+  This is the most important doc
+  """
+  creds = Credentials.from_authorized_user_file("token.json", SCOPES)
+  try:
+    service = build("sheets", "v4", credentials=creds)
+
+    body = {"values": _values}
+
+    result = (
+      service.spreadsheets()
+      .values()
+      .append(
+         spreadsheetId=spreadsheet_id,
+        range=range_name,
+        valueInputOption=value_input_option,
+        body=body,
+      )
+      .execute()
+    )
+    print(f"{(result.get('updates').get('updatedCells'))} cells appended.")
+    return result
+
+  except HttpError as error:
+    print(f"An error ocurred: {error}")
+    return error
 
 
 if __name__ == "__main__":
   # Pass: title
   # create("pau's spreadseet")
-  Spreadsheet_ID =  "1ZAakYz2hvyNtkhyZo042_XHEzTkLC6Rck2Q2aKZ1oYc"
-  range_name = ["B6:C111"]
-  # print(get_values(Spreadsheet_ID, range_name))
-  result = batch_get_values(Spreadsheet_ID, range_name)
-  print(result[0])
+  Spreadsheet_ID =  "1kpj7e08JrhsH4WKJhQeIYXWUh4k4Nc4vKSd-DuZqpVw"
+  range_name = "A1:B1"
 
+  append_values(Spreadsheet_ID, range_name, "USER_ENTERED", [["Pepe","Guardian"]])
 
 
